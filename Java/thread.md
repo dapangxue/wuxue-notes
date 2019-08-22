@@ -3,7 +3,7 @@
 
 ##  一、Java Memeory Model内存模型
 
-<img src="./img/JavaMemoryModel.png" width="50%" height="50%">
+<img src="./img/JavaMemoryModel.PNG" width="50%" height="50%">
 
 当前的JMM内存模型规范主要基于JDK5开始的新的内存模型JSR-133，Java Memory Model总的来说是一个规范，并不是具体的实现，无法与JVM的内存模型进行类比，它的主要描述就是所有的变量都存储在主内存中，模型中的每个线程都有自己的本地内存（抽象概念，涵盖了缓存区，寄存器以及其他的硬件和编译器优化），本地内存中存储了当前线程操作的变量的副本，线程访问的时候不是访问主存中的变量，而是访问本地内存中的变量拷贝。
 Java内存模型除了定义了一套规范，还提供了一系列的原语供开发者使用。
@@ -12,7 +12,7 @@ JMM所提供的原语有：`原子性`、`可见性`和`有序性`。
 
 ```
 + 原子性：就是位于代码块内的一系列操作，要么全部执行掉、要么都不执行，JMM提了Synchronized关键字保证了方法和代码块内的原子性操作。
-+ 可见性：不同的线程之间工作内存都有一份变量的拷贝，同一个变量在不同线程的本地内存的拷贝不一定是最新的，所以需要一种机制将更新后的变量马上刷新回主存，并通知其他线程缓存的变量失效，更新变量的最新值。JMM提供了volatile关键字保证了内存可见性，除了volatile,final和Synchronized也有响应的机制保证内存可见性，但是实现方式不一样。
++ 可见性：不同的线程之间工作内存都有一份变量的拷贝，同一个变量在不同线程的本地内存的拷贝不一定是最新的，所以需要一种机制将更新后的变量马上刷新回主存，并通知其他线程缓存的变量失效，更新变量的最新值。JMM提供了volatile关键字保证了内存可见性，除了volatile,final和Synchronized也有相应的机制保证内存可见性，但是实现方式不一样。
 + 有序性：为了保证程序按照代码的顺序执行，JMM提供了Synchronized和volatile保证了多线程之间的有序性。volatile关键字禁止了指令的重排序保证了有序性（单例模式中的双检锁就是采用了这种方法），而Synchronized关键字保证了同一时刻只能有一个线程操作。
 ```
 
@@ -115,13 +115,13 @@ volatile关键字保证了`可见性`和`原子性`。可见性是指当前线�
 
 ```JAVA
 public class Singleton {
-    
+
     public static volatile Singleton instance;
-    
+
     private Singleton() {
-        
+
     }
-    
+
     public static Singleton getSingleton() {
         if (instance == null) {
             synchronized(Singleton.class) {
@@ -137,7 +137,7 @@ public class Singleton {
         }
         return instance;
     }
-    
+
     /*
     do other thing
     */
@@ -170,7 +170,7 @@ public class Main {
             out.close();
         }
     }
-    
+
     static class MyRunnable implements Runnable {
 
         // 读取字符流
@@ -586,7 +586,7 @@ ThreadPoolExecutor内部采用了一个原子类`AtomicInteger`保存了线程�
         protected boolean isHeldExclusively() {
             return getState() != 0;
         }
-			
+
 		// 可以看出是不可重入的
         protected boolean tryAcquire(int unused) {
             if (compareAndSetState(0, 1)) {
@@ -632,4 +632,3 @@ Executors提供了一些线程池的应用方案，比如newFixedThreadPool、ne
 | 描述                   |                  创建使用固定线程数的线程池                  | 只产生一个线程的线程池  | 根据需要创建新线程，适用于执行很多短期异步任务的小程序 | 主要用于在给定的延迟之后执行任务，或者定期执行任务 |
 | 核心线程数和最大线程数 |                           （n,n）                            |          (1,1)          |                 (0,Integer.MAX_VALUE)                  |              （n,Integer.MAX_VALUE）               |
 | 采用的阻塞队列         | LinkedBlockingQueue可以称为有界阻塞队列，但是队列的容量为Integer.MAX_VALUE |   LinkedBlockingQueue   |              SynchronousQueue（没有容量）              |                  DelayedWorkQueue                  |
-
