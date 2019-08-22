@@ -19,6 +19,7 @@ JMM所提供的原语有：`原子性`、`可见性`和`有序性`。
 > 在《JVM并发编程的艺术》中写到，当final域为基本数据类型时，final域的写final域的重排序规则表明禁止把final域的写重排序到构造函数之外（如果在构造函数内进行初始化的话），也就是在构造函数return之前，插入一个StoreStore屏障。对final域的读重排序就是在一个线程中，初次读对象引用与初次读该对象包含的final域（两个操作1、初次读对象引用，2、初次读该对象包含的final域），JMM禁止处理器重排序这两个操作，即编译器会在读final域操作的前面插入一个LoadLoad屏障。
 
 ## 二、线程的状态
+
 ### 线程的构造方法
 
 线程的构造方法有三种：
@@ -54,7 +55,9 @@ JMM所提供的原语有：`原子性`、`可见性`和`有序性`。
 + 继承整个Thread类的开销过大，如果只是需要重写`run()`方法的话，采用实现Runnable/Callable接口即可。
 
 ### 线程的状态
+
 线程的状态形式分为：NEW、RUNNABLE、WAITING、TIME_WAITING、TERMINATED、BLOCKED
+
 <img src="./img/ThreadState.PNG" title="Logo" width="80%" height="80%" />
 
 上图中，在调用wait方法后，线程的状态变为WAITING/TIME_WAITING状态，因为调用wait方法必须要获取到锁，所以再调用到wait方法后，当前线程进入这个锁的等待队列。
@@ -78,7 +81,7 @@ public static boolean interrupted()
 ## 四、Synchronized和线程中断的关系
 在《Java并发编程的艺术》中提到了Lock接口提供了Synchronized所不具备的特点，具体的汇总如下：
 | 锁的方式  | Synchronized | Lock接口  |
-| ------ | ------| ------|
+| ------ | ------| ------ |
 | 特性 | 隐式锁 | 显式锁 |
 | 在获取到锁的非阻塞状态下(运行期)是否响应中断 | 不响应，如果调用的线程的中断方法没有特殊处理方式的话，当前线程不会响应中断 | 响应，调用Lock接口下lockInterruptibly()方法可以响应中断 |
 | 当前线程在阻塞情况下是否响应中断 | 响应 | 响应 |
@@ -87,11 +90,11 @@ public static boolean interrupted()
 
 ## 五、线程的生命周期
 
-<img src="./img/ThreadLifeCircle.png"/>
+<img src="./img/ThreadLifeCircle.PNG"/>
 
 ## 六、线程间通信
 
-+ 等待通知机制（显示通信）
++ 等待通知机制（显式通信）
 + volatile/synchronized（隐式通信）
 + 管道的输入/输出流（传输的媒介为内存，两个线程建立连接）
 + Thread#join()
@@ -202,7 +205,7 @@ public class Main {
 
 Thread#join()的使用场景：如果主线程建立了一个子线程，如果子线程执行的计算时间较长，那么主线程可能会先于子线程执行完毕，如果主线程想等待子线程执行完后继续执行，那么就可以采用join的机制。主线程如果开启了子线程，并且join了子线程，如果此时有第三个线程中断了主线程，主线程会抛出`InterruptException`异常。
 
-#### Thread#join()和Thread.sleep的区别
+#### Thread#join()和Thread.sleep()的区别
 
 Thread#join()内部是使用了wait(long)的方式实现的，所以Thread#join()会释放锁，Thread.sleep()只会让出当前的CPU，不会释放锁。
 
@@ -256,7 +259,7 @@ ThreadLocal的方法有：
 
 #### ThreadLocal的原理
 
-在ThreadLocal内部有一个内部类`ThreadLocalMap`，内部类中用一个虚引用的数组保存值。
+在ThreadLocal内部有一个内部类`ThreadLocalMap`，内部类中用一个弱引用的数组保存值。
 
 ```JAVA
     public void set(T value) {
@@ -307,7 +310,7 @@ ThreadLocal如果不断地创建，使用完后没有调用ThreadLocal#remove()�
 
 自旋锁虽然可以减轻进入阻塞状态的开销，但是如果获得锁的线程开销时间较长，处于自旋状态下的线程需要不停的自旋，这是一个耗CPU的操作，所以采用自旋锁比较适合用于任务量较小的场景。
 
-在JDK1.6中还引入了自适应自旋锁，也就是自旋的时间不再是固定的，而是和它前面的自旋情况有关。
+在JDK1.6中还引入了自适应自旋锁，也就是自旋的时间不再是固定的，而是和它之前的自旋情况有关。
 
 ### 2.锁消除
 
@@ -345,7 +348,7 @@ ThreadLocal如果不断地创建，使用完后没有调用ThreadLocal#remove()�
 
 JDK1.6引入的优化策略
 
-偏向锁主要是应对只有一个线程多次获得所的场景，适用的场景是大多数情况下，不存在多线程竞争锁，而是由同一个线程获得锁，为了让同一个线程获得锁的开销更低引入了偏向锁。
+偏向锁主要是应对只有一个线程多次获得锁的场景，适用的场景是大多数情况下，不存在多线程竞争锁，而是由同一个线程获得锁，为了让同一个线程获得锁的开销更低引入了偏向锁。
 
 当同一个线程再次尝试获得锁时，如果检测到对象头的Mark Word里面存储的指向当前线程的偏向锁，则无需再进行加锁操作。
 
@@ -392,7 +395,7 @@ JDK1.6引入的优化策略
 
 corePoolSize、maximumPoolSize、keepAliveTime、TimeUnit unit、BlockingQueue workQueue、threadFactory、RejectedExecutionHandler handler
 
-<img src="./img/Executor.png" height=70% width="100%" />
+<img src="./img/Executor.PNG" height=70% width="100%" />
 
 ThreadPoolExecutor类属于线程池的实现类，Executors类下面的newFixedThreadPool、newSingleThreadExecutor、newCachedThreadPool都是基于ThreadPoolExecutor来实现的。
 
