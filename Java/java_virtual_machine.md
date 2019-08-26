@@ -247,3 +247,4 @@ private static final int value = 123;
 ## 参考文献
 
 1. [Java 永久代去哪儿了](https://www.infoq.cn/article/Java-PERMGEN-Removed/)
+2. [ThreadLocal内存泄漏](https://www.cnblogs.com/aspirant/p/8991010.html)
