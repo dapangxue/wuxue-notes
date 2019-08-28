@@ -6,7 +6,7 @@ Java集合的两大接口是`Collection`和`Map`，`Collection`主要用于存�
 
 ### 一、Collection
 
-<img src="./img/Collection.png"/>
+<img src="./img/Collection.PNG"/>
 
 #### List
 
@@ -715,7 +715,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
                                     break;
                                 }
                                 Node<K,V> pred = e;
-                                // 如果不相等就在链表的末尾构建一个新节点 
+                                // 如果不相等就在链表的末尾构建一个新节点
                                 if ((e = e.next) == null) {
                                     pred.next = new Node<K,V>(hash, key,
                                                               value, null);
@@ -946,4 +946,3 @@ public final class ConcurrentCache<K, V> {
     }
 }
 ```
-
