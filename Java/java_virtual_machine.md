@@ -4,7 +4,7 @@
 
 ## 一、虚拟机概况
 
-<img src="./img/JavaVirtualMachine.png">
+<img src="./img/JavaVirtualMachine.PNG">
 
 1. 程序计数器（Program Counter Register）
 2. 虚拟机栈（Virtual Machine Stack）
