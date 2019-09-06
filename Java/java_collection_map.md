@@ -232,7 +232,7 @@ Vector的扩容操作是2倍扩容，而ArrayList是1.5倍扩容。
 
 ##### 1.替代方案
 
-（1）可以采用Collections工具类下的`Collections.synchronizedList()`方法得到一个线程安全的ArrayList类。
+（1）可以采用Collections工具类下的静态内部类`Collections.SynchronizedList`，创建线程安全的List。
 
 ```JAVA
 List<Integer> list = new ArrayList<>();
@@ -250,7 +250,7 @@ public class CopyOnWriteArrayList<E>
 
 #### CopyOnWriteArrayList
 
-CopyOnWriteArrayList的实现很有意思，它采用了读写分离的思想。
+CopyOnWriteArrayList的实现很有意思，它采用了`读写分离`的思想。
 
 对于它的每次写操作都需要将原来的元素拷贝到一个新数组，将新元素写入拷贝的新数组中。
 
