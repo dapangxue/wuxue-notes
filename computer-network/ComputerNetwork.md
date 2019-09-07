@@ -1,12 +1,12 @@
 # 计算机网络
 
-<img src="./img/ComputerNetwork.png" width="80%" height="80%">
+<img src="./img/ComputerNetwork.PNG" width="80%" height="80%">
 
 常用的TCP/IP模型，主要分为四层：应用层、传输层、网络层、物理链路层。
 
 数据在不同层级的传输，需要添加对应层的协议头，和上一层的协议类型。
 
-<img src="./img/SendPackage.png" width="90%" height="80%">
+<img src="./img/SendPackage.PNG" width="90%" height="80%">
 
 ## 数据链路层
 

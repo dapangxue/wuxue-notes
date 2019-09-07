@@ -4,7 +4,7 @@
 
 ## 一、虚拟机概况
 
-<img src="./img/JavaVirtualMachine.png">
+<img src="./img/JavaVirtualMachine.PNG">
 
 1. 程序计数器（Program Counter Register）
 2. 虚拟机栈（Virtual Machine Stack）
@@ -124,7 +124,68 @@ CMS收集器有一些缺点：
 + CMS收集器无法处理浮动垃圾，并发清理时，用户的工作线程还在运行，这一阶段产生的垃圾只能等到下次回收，这部分垃圾叫做浮动垃圾。
 + 由于CMS垃圾收集器基于标记-清除算法，会产生内存碎片。
 
-还有一个特殊的垃圾收集器就是G1收集器，它横跨了新生代和老年代，它将新生代和老年代划分为一个个Region，内部维护了一个优先队列，每次收集都会选择性价比最高的Region进行收集。
+还有一个特殊的垃圾收集器就是G1收集器，它横跨了新生代和老年代，它将新生代和老年代划分为一个个Region，内部维护了一个优先队列，每次收集都会选择性价比最高的Region进行收集。G1收集器采用的垃圾收集算法有复制和标记-整理算法。从整体来看是基于标记-整理算法实现的收集器，从局部来看是基于复制算法实现的。G1相对于CMS收集器的另一大优势就是可预测的停顿。
+
+在Java11中，引入的最新的垃圾收集器Z Garbage Collector是一款可伸缩、低延迟、并发性能好的垃圾收集器。它采用了着色指针和读屏障这两项新技术。
+
+### JVM内存常见问题
+
+常见的内存问题就是内存泄露和内存溢出。
+
+内存溢出指的是程序在内存申请时，没有足够的内存空间分配给它。
+
+内存泄露指的是程序在申请内存后，无法释放已申请的内存空间，内存泄露最终会导致OOM。
+
+出现内存泄露的情况有：
++ 长生命周期的对象持有短生命周期的对象的引用很可能发生内存泄露。
++ 集合中的内存泄露，比如ArrayList,HashMap。
++ ThreadLocal使用不当
+
+#### 内存泄露的代码示例
+
+```JAVA
+public class Simple {
+    Object object;
+    public void method() {
+        object = new Object();
+        // other code
+    }
+}
+```
+
+在上面的示例中，假设创建的Object对象只有在method方法内使用，如果Simple的实例存活时间很长，但是开发者希望在method方法结束后，Object对象被回收，在这样的情况下，是不会被回收的。如果这使用在一个接口中，每分钟接口的调用量是10000，那么这个对象不断创建后，很容易引起OOM的问题。
+
+有一种解决方式如下,及时的解除掉引用，便于垃圾的回收。
+
+```JAVA
+public class Simple {
+    Object object;
+    public void method() {
+        object = new Object();
+        // use Object
+        object = null;
+        // other code
+    }
+}
+```
+
+使用集合类也会引起内存泄露，代码如下
+
+```JAVA
+public class Simple{
+
+    private static List<Object> list = new ArrayList<>();
+
+    public static void method() {
+        Object object = new Object();
+        list.add(object);
+        object = null;
+    }
+
+}
+```
+
+在上面示例中，如果仅仅只是释放引用本身，那么list仍然在引用该对象，所以对象不会被回收，如果需要被回收，可以将对象remove掉，或者list = null进行回收。
 
 ## 四、类加载
 
@@ -188,4 +249,4 @@ private static final int value = 123;
 ## 参考文献
 
 1. [Java 永久代去哪儿了](https://www.infoq.cn/article/Java-PERMGEN-Removed/)
-
+2. [ThreadLocal内存泄漏](https://www.cnblogs.com/aspirant/p/8991010.html)

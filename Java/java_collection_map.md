@@ -6,7 +6,7 @@ Java集合的两大接口是`Collection`和`Map`，`Collection`主要用于存�
 
 ### 一、Collection
 
-<img src="./img/Collection.png"/>
+<img src="./img/Collection.PNG"/>
 
 #### List
 
@@ -232,7 +232,7 @@ Vector的扩容操作是2倍扩容，而ArrayList是1.5倍扩容。
 
 ##### 1.替代方案
 
-（1）可以采用Collections工具类下的`Collections.synchronizedList()`方法得到一个线程安全的ArrayList类。
+（1）可以采用Collections工具类下的静态内部类`Collections.SynchronizedList`，创建线程安全的List。
 
 ```JAVA
 List<Integer> list = new ArrayList<>();
@@ -250,7 +250,7 @@ public class CopyOnWriteArrayList<E>
 
 #### CopyOnWriteArrayList
 
-CopyOnWriteArrayList的实现很有意思，它采用了读写分离的思想。
+CopyOnWriteArrayList的实现很有意思，它采用了`读写分离`的思想。
 
 对于它的每次写操作都需要将原来的元素拷贝到一个新数组，将新元素写入拷贝的新数组中。
 
@@ -715,7 +715,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
                                     break;
                                 }
                                 Node<K,V> pred = e;
-                                // 如果不相等就在链表的末尾构建一个新节点 
+                                // 如果不相等就在链表的末尾构建一个新节点
                                 if ((e = e.next) == null) {
                                     pred.next = new Node<K,V>(hash, key,
                                                               value, null);
@@ -946,4 +946,3 @@ public final class ConcurrentCache<K, V> {
     }
 }
 ```
-

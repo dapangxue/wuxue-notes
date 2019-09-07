@@ -3,7 +3,7 @@
 
 ##  一、Java Memeory Model内存模型
 
-<img src="./img/JavaMemoryModel.png" width="50%" height="50%">
+<img src="./img/JavaMemoryModel.PNG" width="50%" height="50%">
 
 当前的JMM内存模型规范主要基于JDK5开始的新的内存模型JSR-133，Java Memory Model总的来说是一个规范，并不是具体的实现，无法与JVM的内存模型进行类比，它的主要描述就是所有的变量都存储在主内存中，模型中的每个线程都有自己的本地内存（抽象概念，涵盖了缓存区，寄存器以及其他的硬件和编译器优化），本地内存中存储了当前线程操作的变量的副本，线程访问的时候不是访问主存中的变量，而是访问本地内存中的变量拷贝。
 Java内存模型除了定义了一套规范，还提供了一系列的原语供开发者使用。
@@ -12,13 +12,14 @@ JMM所提供的原语有：`原子性`、`可见性`和`有序性`。
 
 ```
 + 原子性：就是位于代码块内的一系列操作，要么全部执行掉、要么都不执行，JMM提了Synchronized关键字保证了方法和代码块内的原子性操作。
-+ 可见性：不同的线程之间工作内存都有一份变量的拷贝，同一个变量在不同线程的本地内存的拷贝不一定是最新的，所以需要一种机制将更新后的变量马上刷新回主存，并通知其他线程缓存的变量失效，更新变量的最新值。JMM提供了volatile关键字保证了内存可见性，除了volatile,final和Synchronized也有响应的机制保证内存可见性，但是实现方式不一样。
++ 可见性：不同的线程之间工作内存都有一份变量的拷贝，同一个变量在不同线程的本地内存的拷贝不一定是最新的，所以需要一种机制将更新后的变量马上刷新回主存，并通知其他线程缓存的变量失效，更新变量的最新值。JMM提供了volatile关键字保证了内存可见性，除了volatile,final和Synchronized也有相应的机制保证内存可见性，但是实现方式不一样。
 + 有序性：为了保证程序按照代码的顺序执行，JMM提供了Synchronized和volatile保证了多线程之间的有序性。volatile关键字禁止了指令的重排序保证了有序性（单例模式中的双检锁就是采用了这种方法），而Synchronized关键字保证了同一时刻只能有一个线程操作。
 ```
 
-> 个人认为final域也可以禁止指令重排序，在《JVM并发编程的艺术》中写到，当final域为基本数据类型时，final域的写final域的重排序规则表明禁止把final域的写重排序到构造函数之外（如果在构造函数内进行初始化的话），也就是在构造函数return之前，插入一个StoreStore屏障。对final域的读重排序就是在一个线程中，初次读对象引用与初次读该对象包含的final域（两个操作1、初次读对象引用，2、初次读该对象包含的final域），JMM禁止处理器重排序这两个操作，即编译器会在读final域操作的前面插入一个LoadLoad屏障。
+> 在《JVM并发编程的艺术》中写到，当final域为基本数据类型时，final域的写final域的重排序规则表明禁止把final域的写重排序到构造函数之外（如果在构造函数内进行初始化的话），也就是在构造函数return之前，插入一个StoreStore屏障。对final域的读重排序就是在一个线程中，初次读对象引用与初次读该对象包含的final域（两个操作1、初次读对象引用，2、初次读该对象包含的final域），JMM禁止处理器重排序这两个操作，即编译器会在读final域操作的前面插入一个LoadLoad屏障。
 
 ## 二、线程的状态
+
 ### 线程的构造方法
 
 线程的构造方法有三种：
@@ -54,7 +55,9 @@ JMM所提供的原语有：`原子性`、`可见性`和`有序性`。
 + 继承整个Thread类的开销过大，如果只是需要重写`run()`方法的话，采用实现Runnable/Callable接口即可。
 
 ### 线程的状态
+
 线程的状态形式分为：NEW、RUNNABLE、WAITING、TIME_WAITING、TERMINATED、BLOCKED
+
 <img src="./img/ThreadState.PNG" title="Logo" width="80%" height="80%" />
 
 上图中，在调用wait方法后，线程的状态变为WAITING/TIME_WAITING状态，因为调用wait方法必须要获取到锁，所以再调用到wait方法后，当前线程进入这个锁的等待队列。
@@ -78,7 +81,7 @@ public static boolean interrupted()
 ## 四、Synchronized和线程中断的关系
 在《Java并发编程的艺术》中提到了Lock接口提供了Synchronized所不具备的特点，具体的汇总如下：
 | 锁的方式  | Synchronized | Lock接口  |
-| ------ | ------| ------|
+| ------ | ------| ------ |
 | 特性 | 隐式锁 | 显式锁 |
 | 在获取到锁的非阻塞状态下(运行期)是否响应中断 | 不响应，如果调用的线程的中断方法没有特殊处理方式的话，当前线程不会响应中断 | 响应，调用Lock接口下lockInterruptibly()方法可以响应中断 |
 | 当前线程在阻塞情况下是否响应中断 | 响应 | 响应 |
@@ -87,11 +90,11 @@ public static boolean interrupted()
 
 ## 五、线程的生命周期
 
-<img src="./img/ThreadLifeCircle.png"/>
+<img src="./img/ThreadLifeCircle.PNG"/>
 
 ## 六、线程间通信
 
-+ 等待通知机制（显示通信）
++ 等待通知机制（显式通信）
 + volatile/synchronized（隐式通信）
 + 管道的输入/输出流（传输的媒介为内存，两个线程建立连接）
 + Thread#join()
@@ -115,13 +118,13 @@ volatile关键字保证了`可见性`和`原子性`。可见性是指当前线�
 
 ```JAVA
 public class Singleton {
-    
+
     public static volatile Singleton instance;
-    
+
     private Singleton() {
-        
+
     }
-    
+
     public static Singleton getSingleton() {
         if (instance == null) {
             synchronized(Singleton.class) {
@@ -137,7 +140,7 @@ public class Singleton {
         }
         return instance;
     }
-    
+
     /*
     do other thing
     */
@@ -170,7 +173,7 @@ public class Main {
             out.close();
         }
     }
-    
+
     static class MyRunnable implements Runnable {
 
         // 读取字符流
@@ -202,7 +205,7 @@ public class Main {
 
 Thread#join()的使用场景：如果主线程建立了一个子线程，如果子线程执行的计算时间较长，那么主线程可能会先于子线程执行完毕，如果主线程想等待子线程执行完后继续执行，那么就可以采用join的机制。主线程如果开启了子线程，并且join了子线程，如果此时有第三个线程中断了主线程，主线程会抛出`InterruptException`异常。
 
-#### Thread#join()和Thread.sleep的区别
+#### Thread#join()和Thread.sleep()的区别
 
 Thread#join()内部是使用了wait(long)的方式实现的，所以Thread#join()会释放锁，Thread.sleep()只会让出当前的CPU，不会释放锁。
 
@@ -256,7 +259,7 @@ ThreadLocal的方法有：
 
 #### ThreadLocal的原理
 
-在ThreadLocal内部有一个内部类`ThreadLocalMap`，内部类中用一个虚引用的数组保存值。
+在ThreadLocal内部有一个内部类`ThreadLocalMap`，内部类中用一个弱引用的数组保存值。
 
 ```JAVA
     public void set(T value) {
@@ -307,7 +310,7 @@ ThreadLocal如果不断地创建，使用完后没有调用ThreadLocal#remove()�
 
 自旋锁虽然可以减轻进入阻塞状态的开销，但是如果获得锁的线程开销时间较长，处于自旋状态下的线程需要不停的自旋，这是一个耗CPU的操作，所以采用自旋锁比较适合用于任务量较小的场景。
 
-在JDK1.6中还引入了自适应自旋锁，也就是自旋的时间不再是固定的，而是和它前面的自旋情况有关。
+在JDK1.6中还引入了自适应自旋锁，也就是自旋的时间不再是固定的，而是和它之前的自旋情况有关。
 
 ### 2.锁消除
 
@@ -392,7 +395,7 @@ JDK1.6引入的优化策略
 
 corePoolSize、maximumPoolSize、keepAliveTime、TimeUnit unit、BlockingQueue workQueue、threadFactory、RejectedExecutionHandler handler
 
-<img src="./img/Executor.png" height=70% width="100%" />
+<img src="./img/Executor.PNG" height=70% width="100%" />
 
 ThreadPoolExecutor类属于线程池的实现类，Executors类下面的newFixedThreadPool、newSingleThreadExecutor、newCachedThreadPool都是基于ThreadPoolExecutor来实现的。
 
@@ -586,7 +589,7 @@ ThreadPoolExecutor内部采用了一个原子类`AtomicInteger`保存了线程�
         protected boolean isHeldExclusively() {
             return getState() != 0;
         }
-			
+
 		// 可以看出是不可重入的
         protected boolean tryAcquire(int unused) {
             if (compareAndSetState(0, 1)) {
@@ -632,4 +635,3 @@ Executors提供了一些线程池的应用方案，比如newFixedThreadPool、ne
 | 描述                   |                  创建使用固定线程数的线程池                  | 只产生一个线程的线程池  | 根据需要创建新线程，适用于执行很多短期异步任务的小程序 | 主要用于在给定的延迟之后执行任务，或者定期执行任务 |
 | 核心线程数和最大线程数 |                           （n,n）                            |          (1,1)          |                 (0,Integer.MAX_VALUE)                  |              （n,Integer.MAX_VALUE）               |
 | 采用的阻塞队列         | LinkedBlockingQueue可以称为有界阻塞队列，但是队列的容量为Integer.MAX_VALUE |   LinkedBlockingQueue   |              SynchronousQueue（没有容量）              |                  DelayedWorkQueue                  |
-
